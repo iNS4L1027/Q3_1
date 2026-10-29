@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ page_title }} | Queue Lab</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', path='style.css') }}">
+
+    <script src="{{ url_for('static', path='script.js') }}" defer></script>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- 상단 헤더 -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">Q</div>
+            <div>
+                <h1>Queue Lab</h1>
+                <p>자료구조 시각화 학습 도구</p>
+            </div>
+        </div>
+
+        <div class="header-status">
+            <span class="status-dot"></span>
+            INTERACTIVE LEARNING
+        </div>
+    </header>
+
+    <!-- 큐 종류별 페이지 이동 -->
+    <nav class="navigation">
+        <a href="/queue/simple"
+           class="nav-link {% if queue_type == 'simple' %}active{% endif %}">
+            <span class="nav-number">01</span>
+            <span>단순 큐</span>
+        </a>
+
+        <a href="/queue/circular"
+           class="nav-link {% if queue_type == 'circular' %}active{% endif %}">
+            <span class="nav-number">02</span>
+            <span>서큘러 큐</span>
+        </a>
+
+        <a href="/queue/linked"
+           class="nav-link {% if queue_type == 'linked' %}active{% endif %}">
+            <span class="nav-number">03</span>
+            <span>원형 링크드 리스트 큐</span>
+        </a>
+    </nav>
+
+    <!-- 페이지 제목 -->
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">DATA STRUCTURE / QUEUE</p>
+            <h2>{{ page_title }}</h2>
+            <p class="page-description">{{ page_description }}</p>
+        </div>
+
+        <div class="fifo-badge">
+            <span>FIFO</span>
+            <small>First In, First Out</small>
+        </div>
+    </section>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="workspace">
+
+        <!-- 좌측: 조작 및 코드 -->
+        <section class="left-column">
+
+            <article class="panel control-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-label">CONTROL</span>
+                        <h3>큐 조작</h3>
+                    </div>
+                    <span class="panel-icon">⌘</span>
+                </div>
+
+                <label for="queue-size">큐 최대 크기 (size)</label>
+
+                <div class="size-input-row">
+                    <input
+                        type="number"
+                        id="queue-size"
+                        min="1"
+                        max="20"
+                        step="1"
+                        value="5"
+                        placeholder="크기 입력"
+                    >
+
+                    <button type="button"
+                            id="create-queue"
+                            class="button button-primary">
+                        큐 생성
+                    </button>
+                </div>
+
+                <div class="input-divider"></div>
+
+                <label for="enqueue-value">삽입할 데이터</label>
+
+                <div class="enqueue-input-row">
+                    <input
+                        type="text"
+                        id="enqueue-value"
+                        maxlength="12"
+                        placeholder="데이터 입력 (예: A)"
+                    >
+
+                    <button type="button"
+                            id="enqueue-button"
+                            class="button button-success">
+                        Enqueue ↑
+                    </button>
+                </div>
+
+                <button type="button"
+                        id="dequeue-button"
+                        class="button button-danger button-full">
+                    Dequeue ↓
+                    <span>맨 앞 원소 추출</span>
+                </button>
+
+                <div class="control-footer">
+                    <span class="mini-dot"></span>
+                    <span id="queue-status">큐를 먼저 생성해 주세요.</span>
+                </div>
+            </article>
+
+            <!-- 코드 표시 -->
+            <article class="panel code-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-label">SOURCE CODE</span>
+                        <h3>실행 코드</h3>
+                    </div>
+                    <span class="language-badge">JavaScript</span>
+                </div>
+
+                <p class="muted-text">
+                    버튼을 누르면 해당 동작의 코드가 표시됩니다.
+                </p>
+
+                <div class="code-window">
+                    <div class="code-toolbar">
+                        <div class="window-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span id="code-title">queue.js</span>
+                    </div>
+
+                    <pre class="code-content"><code id="code-display">// 큐를 생성하면 코드가 표시됩니다.</code></pre>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- 우측: 시각화 및 상태 -->
+        <section class="right-column">
+
+            <!-- 큐 시각화 -->
+            <article class="panel visualization-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-label">VISUALIZATION</span>
+                        <h3>큐 구조</h3>
+                    </div>
+
+                    <span id="structure-badge" class="structure-badge">
+                        NOT CREATED
+                    </span>
+                </div>
+
+
+
+                <!-- JS가 큐 도형을 그리는 영역 -->
+                <div id="queue-canvas"
+                     class="queue-canvas"
+                     aria-live="polite">
+
+                    <div class="empty-state">
+                        <div class="empty-state-icon">＋</div>
+                        <h4>큐가 아직 생성되지 않았습니다.</h4>
+                        <p>왼쪽에서 크기를 입력하고 큐를 생성하세요.</p>
+                    </div>
+
+                </div>
+
+                <div class="visualization-footer">
+                    <span id="element-count">원소: 0개</span>
+                    <span id="capacity-count">용량: -</span>
+                </div>
+            </article>
+
+            <!-- 변수 상태 -->
+            <article class="panel variables-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-label">INTERNAL STATE</span>
+                        <h3>큐 변수 상태</h3>
+                    </div>
+                </div>
+
+                <div id="variable-grid" class="variable-grid">
+
+                    <div class="variable-card">
+                        <span class="variable-name">size</span>
+                        <strong class="variable-value">-</strong>
+                        <small>최대 저장 원소 수</small>
+                    </div>
+
+                    <div class="variable-card">
+                        <span class="variable-name">count</span>
+                        <strong class="variable-value">-</strong>
+                        <small>현재 원소 수</small>
+                    </div>
+
+                </div>
+
+                <p class="variable-note">
+                    큐 종류에 따라 표시되는 변수가 달라집니다.
+                </p>
+            </article>
+
+            <!-- 출력 로그 -->
+            <article class="panel output-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="section-label">CONSOLE</span>
+                        <h3>실행 출력</h3>
+                    </div>
+
+                    <button type="button"
+                            id="clear-output"
+                            class="button button-ghost">
+                        지우기
+                    </button>
+                </div>
+
+                <div id="output-console"
+                     class="output-console"
+                     role="log"
+                     aria-live="polite">
+                    <div class="console-line console-muted">
+                        <span class="console-prefix">&gt;</span>
+                        <span>실행 결과가 여기에 표시됩니다.</span>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <span>QUEUE LAB</span>
+        <span>자료구조 학습 프로젝트</span>
+    </footer>
+
+</div>
+</body>
+</html>
